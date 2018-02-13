@@ -5,10 +5,10 @@
   "babel": {
     "presets": ["latest"]
   },
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
     "babel-node": "babel-node --presets=latest",
-    "start": "nodemon --exec npm run babel-node -- index.js",
+    "start": "nodemon --exec npm run babel-node -- ./src/index.js",
     "build": "babel src -d dist"
   },
   "keywords": [],
