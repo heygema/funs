@@ -10,7 +10,7 @@ const formPage = new Promise((resolve, reject) => {
   });
 });
 
-const mimeType = {
+const mimes = {
   '.jpg': 'image/jpg',
   '.video': 'video/mp4',
   '.txt': 'text/plain',
