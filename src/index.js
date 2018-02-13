@@ -79,11 +79,16 @@ server.on('request', (req, res) => {
       break;
     }
     case '/uploaded': {
-      let result = req.headers;
-      console.log(result);
-      res.write(JSON.stringify(result));
+      let headHead = req.headers;
+      let uploadPath = path.join(__dirname, '../uploads/');
+      console.log(headHead);
+      res.write(JSON.stringify(headHead), '\n');
       req.on('data', data => {
         res.write(data);
+        fs.writeFile(uploadPath + 'test.txt', data, err => {
+          if (err) console.log(err);
+          console.log('write finish');
+        });
       });
       req.on('end', () => {
         res.end();
