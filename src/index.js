@@ -3,12 +3,20 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 
+const formPage = new Promise((resolve, reject) => {
+  fs.readFile(path.join(__dirname, 'index.html'), (err, result) => {
+    if (err) reject(err);
+    resolve(result);
+  });
+});
+
 const mimeType = {
-  jpg: 'image/jpg',
-  video: 'video/mp4',
-  txt: 'text/plain',
-  jpeg: 'image/jpeg',
-  png: 'image/png'
+  '.jpg': 'image/jpg',
+  '.video': 'video/mp4',
+  '.txt': 'text/plain',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.html': 'text/html'
 };
 
 let products = [
@@ -22,6 +30,17 @@ let server = http.createServer();
 function ServerErrorPage(req, res) {
   res.writeHead(404, 'Content-Type', 'text/plain');
   res.end('<p>404. Page Not Found</p>');
+}
+
+function ServeFormPage(req, res) {
+  formPage
+    .then(data => {
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.end(data);
+    })
+    .catch(err => {
+      ServerErrorPage(req, res);
+    });
 }
 
 // FIXME: fix serve file;
@@ -39,20 +58,36 @@ server.on('request', (req, res) => {
   const {method, url} = req;
   if (url.startsWith('/file/')) {
     let fileName = url.slice(6);
-    res.end(fileName);
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end(path.extname(fileName));
     return;
   }
+  if (url.startsWith('/file')) {
+    res.end('file');
+    return;
+  }
+
   switch (url) {
     case '/': {
-      res.writeHead(200, 'Content-Type', 'text/plain');
-      res.write('<p>Hello, World</p>');
-      res.end();
+      ServeFormPage(req, res);
       break;
     }
     case '/products': {
       res.writeHead(200, {'Content-Type': 'application/json'});
       let json = JSON.stringify(products);
       res.end(json);
+      break;
+    }
+    case '/uploaded': {
+      let result = req.headers;
+      console.log(result);
+      res.write(JSON.stringify(result));
+      req.on('data', data => {
+        res.write(data);
+      });
+      req.on('end', () => {
+        res.end();
+      });
       break;
     }
     case '/cat': {
