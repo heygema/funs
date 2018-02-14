@@ -2,6 +2,7 @@
 import http from 'http';
 import fs from 'fs';
 import path from 'path';
+import uuidv1 from 'uuid/v1';
 
 const formPage = new Promise((resolve, reject) => {
   fs.readFile(path.join(__dirname, 'index.html'), (err, result) => {
@@ -78,14 +79,14 @@ server.on('request', (req, res) => {
       res.end(json);
       break;
     }
-    case '/uploaded': {
-      let headHead = req.headers;
+    case '/upload': {
+      // FIXME:
+      // let writeStream = fs.createWriteStream(uuidv1().toString() + '.txt');
       let uploadPath = path.join(__dirname, '../uploads/');
-      console.log(headHead);
-      res.write(JSON.stringify(headHead), '\n');
       req.on('data', data => {
+        console.log(data);
         res.write(data);
-        fs.writeFile(uploadPath + 'test.txt', data, err => {
+        fs.writeFile(uploadPath + uuidv1().toString() + '.txt', data, err => {
           if (err) console.log(err);
           console.log('write finish');
         });

@@ -19,8 +19,12 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-latest": "^6.24.1",
+    "eslint-plugin-babel": "^4.1.2",
     "nodemon": "^1.14.12",
     "yarn": "^1.3.2"
   },
-  "repository": "https://github.com/heygema/funs.git"
+  "repository": "https://github.com/heygema/funs.git",
+  "dependencies": {
+    "uuid": "^3.2.1"
+  }
 }

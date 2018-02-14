@@ -9,29 +9,28 @@
     </title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous">
-    <style>
-        /* body,
-        html {
-            display: flex;
-        }
-
-        .form-group {
-            flex: 1;
-            justify-content: center;
-            align-items: center;
-        } */
-    </style>
 </head>
 
 <body>
     <div class="container">
         <h1>please upload something</h1>
         <div class="form-group">
-            <form action="/uploaded" method="POST">
+            <form id="myForm" action="/upload" onsubmit="uploadImage()" method="POST">
                 <input type="text" name="person" />
-                <input type="file" name="avatar" />
+
                 <button class="btn btn-primary" type="submit">submit</button>
             </form>
+            <script>
+                function uploadImage() {
+                    let form = document.getElementById("myForm")
+                    let formData = new FormData(form);
+                    // formData.append('photo', image);
+                    fetch('http://localhost:8000/upload/', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+            </script>
         </div>
     </div>
 </body>
