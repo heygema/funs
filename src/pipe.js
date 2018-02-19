@@ -1,6 +1,6 @@
 // @flow
 function pipe(readStream: *, writeStream: *) {
-  readStream.on('data', ch => {
+  readStream.on('data', (ch) => {
     let shouldContinue = writeStream.write(ch);
     if (!shouldContinue) {
       readStream.pause();

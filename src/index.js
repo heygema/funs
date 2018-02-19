@@ -1,15 +1,8 @@
 // @flow
-import http, {createServer} from 'http';
-import path, {join} from 'path';
-import uuidv1 from 'uuid/v1';
+import {createServer} from 'http';
+import {join} from 'path';
 import Router from './Router';
-import {ServeFile, ServeErrorPage} from './RequestHandlers';
-
-const usersDummy = [
-  {id: 1, name: 'Darcien', favoriteFood: 'pringles'},
-  {id: 2, name: 'Yosua', favoriteFood: 'chicken'},
-  {id: 3, name: 'Domi', favoriteFood: 'beef'},
-];
+import {ServeFile} from './RequestHandlers';
 
 let s = createServer();
 let router = new Router();
@@ -25,22 +18,18 @@ s.on('request', (rq, rs) => {
 // adding route
 router.addRoute('/', ({rq, rs}) => {
   let indexPath = join(__dirname, './index.html');
-  let r = ServeFile(rq, rs, indexPath);
+  ServeFile(rq, rs, indexPath);
 });
 
 router.addRoute('/404', ({rq, rs}) => {
   let filePath = join(__dirname, './404.html');
-  let r = ServeFile(rq, rs, filePath);
+  ServeFile(rq, rs, filePath);
 });
 
 router.addRoute('/file/:fileName', ({rq, rs}, fileName) => {
-  let indexPath = join(__dirname, './index.html');
-  ServeFile(rq, rs, indexPath);
-});
-
-router.addRoute('/user/:id', ({rq, rs}, id) => {
-  let indexPath = join(__dirname, './index.html');
-  ServeFile(rq, rs, indexPath);
+  let filePath = join(__dirname, '../uploads/', fileName);
+  console.log(filePath);
+  ServeFile(rq, rs, filePath);
 });
 
 s.listen(8000);

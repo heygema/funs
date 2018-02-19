@@ -1,5 +1,5 @@
 import fs from 'fs';
-import mime from 'mime-component';
+// import mime from 'mime-component';
 
 export function ServerErrorPage(rq, rs) {
   rs.writeHead(404, 'Content-Type', 'text/plain');
@@ -13,11 +13,18 @@ export function ServeFile(rq, rs, filePath) {
     ServerErrorPage(rq, rs);
   });
   readStream.pipe(rs);
-  let contentType = {'Content-Type': mime.lookup(fileExt)};
-  readStream.on('end', () => {
-    rs.writeHead(200, contentType);
-    rs.end();
+  // let contentType = {'Content-Type': mime.lookup(fileExt)};
+  // readStream.on('end', () => {
+  //   rs.writeHead(200, contentType);
+  //   rs.end();
+  // });
+}
+
+export function rts(rq, rs) {
+  rs.writeHead(302, {
+    Location: 'https://stackoverflow.com/sdfsdfda',
   });
+  rs.end();
 }
 
 export function UploadFile(rq, rs) {}

@@ -7,7 +7,7 @@
     }
   },
   "parser": "babel-eslint",
-  "extends": ["plugin:flowtype/recommended"],
+  "extends": ["plugin:flowtype/recommended", "plugin:react/recommended"],
   "plugins": ["babel", "flowtype"],
   "env": {
     "browser": true,
@@ -126,7 +126,7 @@
     "no-undef": 1,
     "no-undefined": 0,
     "no-undef-init": 0,
-    "no-unused-vars": 0,
+    "no-unused-vars": 1,
     "no-use-before-define": 0,
 
     "handle-callback-err": 1,
