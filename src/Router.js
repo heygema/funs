@@ -14,6 +14,13 @@ class Router {
     let handler = this.routes.get(patternName);
     if (handler) {
       handler(context);
+    } else {
+      handler = this.routes.get('/404');
+      if (handler) {
+        handler(context);
+      } else {
+        context.rs.end('<p>404 not found</p>');
+      }
     }
   }
 }
