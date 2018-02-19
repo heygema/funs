@@ -1,144 +1,72 @@
 // @flow
-import http from 'http';
+import http, {createServer} from 'http';
 import fs from 'fs';
-import path from 'path';
+import path, {join} from 'path';
 import uuidv1 from 'uuid/v1';
-
-const formPage = new Promise((resolve, reject) => {
-  fs.readFile(path.join(__dirname, 'index.html'), (err, result) => {
-    if (err) reject(err);
-    resolve(result);
-  });
-});
+import Router from './Router';
 
 const mimes = {
-  '.jpg': 'image/jpg',
-  '.video': 'video/mp4',
-  '.txt': 'text/plain',
-  '.jpeg': 'image/jpeg',
-  '.png': 'image/png',
-  '.html': 'text/html'
+  jpg: 'image/jpg',
+  video: 'video/mp4',
+  txt: 'text/plain',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  html: 'text/html'
 };
 
-let products = [
-  {id: 1, name: 'apple', price: 2000},
-  {id: 2, name: 'banana', price: 102000},
-  {id: 3, name: 'manggo', price: 9300}
+const usersDummy = [
+  {id: 1, name: 'Darcien', favoriteFood: 'pringles'},
+  {id: 2, name: 'Yosua', favoriteFood: 'chicken'},
+  {id: 3, name: 'Domi', favoriteFood: 'beef'}
 ];
 
-let thing = [];
+let s = createServer();
+let router = new Router();
 
-let server = http.createServer();
-
-function ServerErrorPage(req, res) {
-  res.writeHead(404, 'Content-Type', 'text/plain');
-  res.end('<p>404. Page Not Found</p>');
+function ServerErrorPage(rq, rs) {
+  rs.writeHead(404, 'Content-Type', 'text/plain');
+  rs.end(`<p>404. Anything you looking for, Not Found.</p>`);
 }
 
-function ServeFormPage(req, res) {
-  formPage
-    .then(data => {
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.end(data);
-    })
-    .catch(err => {
-      ServerErrorPage(req, res);
-    });
-}
-
-// FIXME: fix serve file;
-function ServeFile(req, res, filePath) {
+function ServeFile(rq, rs, filePath) {
   let readStream = fs.createReadStream(filePath);
-  // res.writeHead()
-  req.pipe(readStream);
-  res.end();
+  let fileExt = filePath.split('.').pop();
+  readStream.on('error', () => {
+    ServerErrorPage(rq, rs);
+  });
+  readStream.pipe(rs);
+  readStream.on('end', () => {
+    rs.writeHead(200, {'Content-Type': mimes[fileExt]});
+    rs.end();
+  });
 }
 
-server.on('error', err => {
-  console.log('error', err);
+function UploadFile(rq, rs) {}
+
+s.on('error', er => {
+  console.log('error', er);
 });
 
-server.on('request', (req, res) => {
-  const {method, url} = req;
-  if (url.startsWith('/file/')) {
-    let fileName = url.slice(6);
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(path.extname(fileName));
-    return;
-  }
-  if (url.startsWith('/file')) {
-    res.end('file');
-    return;
-  }
-
-  switch (url) {
-    case '/': {
-      ServeFormPage(req, res);
-      break;
-    }
-    case '/products': {
-      res.writeHead(200, {'Content-Type': 'application/json'});
-      let json = JSON.stringify(products);
-      res.end(json);
-      break;
-    }
-    case '/submit': {
-      req.pipe(
-        fs.createWriteStream(
-          path.join(__dirname, '../uploads/' + Math.random() + '.txt')
-        )
-      );
-      res.on('end', () => {
-        res.end('done');
-      });
-      break;
-    }
-    case '/submit-json': {
-      req.on('data', chunk => {
-        console.log(JSON.parse(chunk));
-      });
-      req.on('end', () => {
-        res.end();
-      });
-      break;
-    }
-    case '/upload': {
-      // FIXME:
-      // let writeStream = fs.createWriteStream(uuidv1().toString() + '.txt');
-      let uploadPath = path.join(__dirname, '../uploads/');
-      req.on('data', data => {
-        console.log(data);
-        res.write(data);
-        fs.writeFile(uploadPath + uuidv1().toString() + '.txt', data, err => {
-          if (err) console.log(err);
-          console.log('write finish');
-        });
-      });
-      req.on('end', () => {
-        res.end();
-      });
-      break;
-    }
-    case '/cat': {
-      let filePath = path.join(__dirname, '../uploads/cat.jpg');
-      console.log(filePath);
-      fs.readFile(filePath, (err, image) => {
-        if (err) {
-          ServerErrorPage(req, res);
-        } else {
-          res.writeHead(200, {'Content-Type': 'image/jpg'});
-          res.end(image);
-        }
-      });
-      break;
-    }
-    default: {
-      ServerErrorPage(req, res);
-      break;
-    }
-  }
+s.on('request', (rq, rs) => {
+  router.handleRequest(rq.url, {rq, rs});
 });
 
-server.listen(8000);
+// adding route
+router.addRoute('/', ({rq, rs}) => {
+  let indexPath = join(__dirname, './index.html');
+  ServeFile(rq, rs, indexPath);
+});
+
+router.addRoute('/file/:fileName', ({rq, rs}, fileName) => {
+  let indexPath = join(__dirname, './index.html');
+  ServeFile(rq, rs, indexPath);
+});
+
+router.addRoute('/user/:id', ({rq, rs}, id) => {
+  let indexPath = join(__dirname, './index.html');
+  ServeFile(rq, rs, indexPath);
+});
+
+s.listen(8000);
 
 console.log('server start at 8000');
