@@ -15,21 +15,46 @@
     <div class="container">
         <h1>please upload something</h1>
         <div class="form-group">
-            <form id="myForm" action="/upload" onsubmit="uploadImage()" method="POST">
-                <input type="text" name="person" />
-
+            <form id="myForm">
+                <input type="text" name="product_name" placeholder="product name" />
+                <input type="text" name="product_price" placeholder="product price" />
                 <button class="btn btn-primary" type="submit">submit</button>
             </form>
             <script>
-                function uploadImage() {
-                    let form = document.getElementById("myForm")
-                    let formData = new FormData(form);
-                    // formData.append('photo', image);
-                    fetch('http://localhost:8000/upload/', {
+                let formId = document.getElementById("myForm");
+                formId.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    let formD = new FormData(formId)
+                    let jsonData = {
+                        'product_name': formD.get('product_name'),
+                        'product_price': formD.get('product_price')
+                    }
+
+
+                    console.log(jsonData)
+
+                    // TODO: make it fetch and send json data;
+
+                    fetch('/submit-json', {
                         method: 'POST',
-                        body: formData
-                    });
-                }
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData),
+                    }).then((x) => {
+                        console.log(x);
+                    })
+                })
+
+                // function uploadImage() {
+                //     let form = document.getElementById("myForm")
+                //     let formData = new FormData(form);
+                //     // formData.append('photo', image);
+                //     fetch('http://localhost:8000/upload/', {
+                //         method: 'POST',
+                //         body: formData
+                //     });
+                // }
             </script>
         </div>
     </div>

@@ -26,6 +26,8 @@ let products = [
   {id: 3, name: 'manggo', price: 9300}
 ];
 
+let thing = [];
+
 let server = http.createServer();
 
 function ServerErrorPage(req, res) {
@@ -48,7 +50,8 @@ function ServeFormPage(req, res) {
 function ServeFile(req, res, filePath) {
   let readStream = fs.createReadStream(filePath);
   // res.writeHead()
-  res.end(filePath);
+  req.pipe(readStream);
+  res.end();
 }
 
 server.on('error', err => {
@@ -77,6 +80,26 @@ server.on('request', (req, res) => {
       res.writeHead(200, {'Content-Type': 'application/json'});
       let json = JSON.stringify(products);
       res.end(json);
+      break;
+    }
+    case '/submit': {
+      req.pipe(
+        fs.createWriteStream(
+          path.join(__dirname, '../uploads/' + Math.random() + '.txt')
+        )
+      );
+      res.on('end', () => {
+        res.end('done');
+      });
+      break;
+    }
+    case '/submit-json': {
+      req.on('data', chunk => {
+        console.log(JSON.parse(chunk));
+      });
+      req.on('end', () => {
+        res.end();
+      });
       break;
     }
     case '/upload': {
@@ -117,3 +140,5 @@ server.on('request', (req, res) => {
 });
 
 server.listen(8000);
+
+console.log('server start at 8000');
