@@ -1,5 +1,5 @@
 import fs from 'fs';
-// import mime from 'mime-component';
+import mime from 'mime';
 
 export function ServerErrorPage(rq, rs) {
   rs.writeHead(404, 'Content-Type', 'text/plain');
@@ -12,12 +12,13 @@ export function ServeFile(rq, rs, filePath) {
   readStream.on('error', () => {
     ServerErrorPage(rq, rs);
   });
+  let m = mime.getType(fileExt);
+  let contentType = {'Content-Type': m};
   readStream.pipe(rs);
-  // let contentType = {'Content-Type': mime.lookup(fileExt)};
-  // readStream.on('end', () => {
-  //   rs.writeHead(200, contentType);
-  //   rs.end();
-  // });
+  readStream.on('end', () => {
+    rs.writeHead(200, contentType);
+    rs.end();
+  });
 }
 
 export function rts(rq, rs) {

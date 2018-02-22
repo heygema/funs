@@ -2,16 +2,16 @@
 import {createServer} from 'http';
 import {join} from 'path';
 import Router from './Router';
-import {ServeFile} from './RequestHandlers';
+import {ServeFile} from './ServeHandlers';
 
-let s = createServer();
+let server = createServer();
 let router = new Router();
 
-s.on('error', (er) => {
+server.on('error', (er) => {
   console.log('error', er);
 });
 
-s.on('request', (rq, rs) => {
+server.on('request', (rq, rs) => {
   router.handleRequest(rq.url, {rq, rs});
 });
 
@@ -21,17 +21,19 @@ router.addRoute('/', ({rq, rs}) => {
   ServeFile(rq, rs, indexPath);
 });
 
-router.addRoute('/404', ({rq, rs}) => {
-  let filePath = join(__dirname, './404.html');
-  ServeFile(rq, rs, filePath);
+router.addRoute('/submit-json', (req, res) => {
+  jsonData = req.body;
 });
 
+//FIXME: fix this join path
 router.addRoute('/file/:fileName', ({rq, rs}, fileName) => {
+  if (Array.isArray(fileName)) {
+    fileName = fileName.join('');
+  }
   let filePath = join(__dirname, '../uploads/', fileName);
-  console.log(filePath);
   ServeFile(rq, rs, filePath);
 });
 
-s.listen(8000);
+server.listen(8000);
 
 console.log('server start at 8000');

@@ -30,7 +30,7 @@
   "repository": "https://github.com/heygema/funs.git",
   "dependencies": {
     "eslint": "^4.18.0",
-    "mime-component": "0.0.1",
+    "mime": "^2.2.0",
     "uuid": "^3.2.1"
   }
 }
