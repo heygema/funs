@@ -21,8 +21,18 @@ router.addRoute('/', ({rq, rs}) => {
   ServeFile(rq, rs, indexPath);
 });
 
-router.addRoute('/submit-json', (req, res) => {
-  jsonData = req.body;
+router.addRoute('/submit-json', ({rq, rs}) => {
+  // TODO: check request body
+  let result;
+  rq.on('data', (chnk) => {
+    result += chnk;
+  });
+
+  rq.on('end', () => {
+    console.log(JSON.parse(result));
+    rs.end();
+  });
+  // jsonData = req.body;
 });
 
 //FIXME: fix this join path

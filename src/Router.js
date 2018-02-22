@@ -1,7 +1,7 @@
 // @flow
 type RouteHandler<Context> = (
   context: Context,
-  pathData: string | Array<string>,
+  pathData?: string | Array<string>,
 ) => void;
 
 type Routes<Context> = Map<string, RouteHandler<Context>>;
@@ -17,7 +17,12 @@ class Router<Context> {
 
   handleRequest(patternName: string, context: Context) {
     // TODO: match pattern and path received -> execute handler
-    let routesKeys = Array.from(this.routes.keys());
+    // :FIXME: fix this later
+    // let routesKeys = Array.from(this.routes.keys());
+    let handlr = this.routes.get(patternName);
+    if (handlr) {
+      handlr(context, '');
+    }
   }
 }
 
