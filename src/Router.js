@@ -6,7 +6,7 @@ type RouteHandler<Context> = (
 
 type Routes<Context> = Map<string, RouteHandler<Context>>;
 
-function patterMatch(pattern: string, path: string) {}
+// function patterMatch(pattern: string, path: string) {}
 
 class Router<Context> {
   routes: Routes<Context> = new Map();

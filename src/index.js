@@ -11,38 +11,38 @@ server.on('error', (er) => {
   console.log('error', er);
 });
 
-server.on('request', (rq, rs) => {
-  router.handleRequest(rq.url, {rq, rs});
+server.on('request', (req, res) => {
+  router.handleRequest(req.url, {req, res});
 });
 
 // adding route
-router.addRoute('/', ({rq, rs}) => {
+router.addRoute('/', ({req, res}) => {
   let indexPath = join(__dirname, './index.html');
-  ServeFile(rq, rs, indexPath);
+  ServeFile(req, res, indexPath);
 });
 
-router.addRoute('/submit-json', ({rq, rs}) => {
+router.addRoute('/submit-json', ({req, res}) => {
   // TODO: check request body
   let result;
-  rq.on('data', (chnk) => {
+  req.on('data', (chnk) => {
     result += chnk;
   });
 
-  rq.on('end', () => {
+  req.on('end', () => {
     console.log(JSON.parse(result));
-    rs.end();
+    res.end();
   });
   // jsonData = req.body;
 });
 
 //FIXME: fix this join path
-router.addRoute('/file/:fileName', ({rq, rs}, fileName) => {
-  if (Array.isArray(fileName)) {
-    fileName = fileName.join('');
-  }
-  let filePath = join(__dirname, '../uploads/', fileName);
-  ServeFile(rq, rs, filePath);
-});
+// router.addRoute('/file/:fileName', ({req, res}, fileName) => {
+//   if (Array.isArray(fileName)) {
+//     fileName = fileName.join('');
+//   }
+//   let filePath = join(__dirname, '../uploads/', fileName);
+//   ServeFile(req, res, filePath);
+// });
 
 server.listen(8000);
 
